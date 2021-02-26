@@ -13,10 +13,10 @@ import { CommonModule } from '@angular/common';
     selector : 'ng-app',
     template : `
                 <h2>User Review:</h2>
-                <textarea class="textfield" placeholder="Write your Review" [value]="review_input"></textarea>
+                <textarea class="textfield" placeholder="Write your Review" [value]="review_input" (input)="handleChange($event)"></textarea>
                 <br/><br/>
                 <h3>Output:</h3>
-                <div class="output" [innerHTML]="review_content"></div>
+                <div class="output" [innerText]="review_content"></div>
                 `,
     styles : [
         `.textfield {
@@ -28,6 +28,7 @@ import { CommonModule } from '@angular/common';
         `.output { 
             max-width: 100%;
             width: 600px;
+            white-space: pre;
             border: solid 1px #f9f6f6;
             padding: 5px;
             background: #ecebeb; 
@@ -47,11 +48,25 @@ Pellentesque blandit mauris congue elit eleifend, facilisis tristique dolor dict
 At https://wallethub.com <b>bolded text</b>`;
 
     review_content = "";
+    // About url check: https://stackoverflow.com/a/1500501/6512565
+    // also can add rich text editor
+
 
     ngOnInit() {
         this.review_content = this.review_input;
     }
 
+    urlify(text) {
+        var urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, function(url) {
+          return '<a href="' + url + '">' + url + '</a>';
+        })
+        // or alternatively
+        // return text.replace(urlRegex, '<a href="$1">$1</a>')
+      }
+      handleChange(e) {
+        this.review_content =  this.urlify(e.target.value);
+    }
 }
 
 @NgModule({
