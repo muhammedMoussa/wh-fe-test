@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 /**
  * Update the following components to meet the requirements : 
  * 
@@ -18,12 +19,14 @@ import { CommonModule } from '@angular/common';
 
 @Component({
     selector : 'ng-app',
-    template : `<form>
+    template : `<form (ngSubmit)="handleSubmit($event)" >
                     <h2>Login</h2>
                     <br/>
-                    <input type="email" value="" name="email" />
+                    <input type="email" [(ngModel)]="email" name="email" />
+                    <p>{{emailError}}</p>
                     <br/>
-                    <input type="password" value="" name="password" />
+                    <input type="password" [(ngModel)]="password" name="password" /> <br />
+                    <p>{{passwordError}}</p>
                     <button type="submit">Submit</button>
                     <br/><br/>
                     <div *ngIf="logged_in">Logged In!</div>
@@ -34,12 +37,62 @@ export class Test03Component {
     email:string = "";
     password:string = "";
 
-    logged_in = false;
+    emailError:string = "";
+    passwordError:string = "";
+
+    private _logged_in = false;
+
+    set logged_in(v : boolean) {
+        this._logged_in = v;
+    }
+
+    get logged_in() : boolean {
+        return this._logged_in;
+    }
+    
+    handleSubmit(e) {
+        e.preventDefault();
+
+        const {email, password} = this;
+        const emailRegex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,}$/;
+
+        this.clearErrors();
+
+        if(email && password) {
+            if(!emailRegex.test(email)) {
+                this.emailError = "Invalid email";
+                return this.logged_in = false;
+            }
+
+            if(!passRegex.test(password)) {
+                this.passwordError = "Sorry, Password have to contains at least one special character, one upper case character, one lower case character, one number and a minium of 8 characters";
+                return this.logged_in = false;
+            }
+
+            if(emailRegex.test(email) && passRegex.test(password)) {
+                alert(`Welcome ${email.split('@')[0]}`);
+                this.clearErrors();
+                this._logged_in = true;
+            }
+        } else {
+            this.emailError = "Required";
+            this.passwordError = "Required";
+            this.logged_in = false;
+        }    
+    }
+
+    clearErrors() {
+        this.emailError = "";
+        this.passwordError = "";
+    }
+    
 }
 
 @NgModule({
     imports : [
         CommonModule,
+        FormsModule,
         RouterModule.forChild([
             {
                 path : "",
