@@ -4,7 +4,7 @@
  * * Spot the memory leak
  * 
  */
-import { Component, NgModule, Injectable, Input  } from '@angular/core';
+import { Component, NgModule, Injectable, Input, ChangeDetectorRef  } from '@angular/core';
 import { RouterModule, Router} from "@angular/router";
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
@@ -36,7 +36,7 @@ export class TestService {
 export class MainComponent {
     test:string = null;
 
-    constructor(private _srv:TestService) {
+    constructor(private _srv:TestService, private cd: ChangeDetectorRef) {
 
     }
 
@@ -45,6 +45,10 @@ export class MainComponent {
         this._srv.test.subscribe(test=>{
             this.test = test;
         });
+    }
+
+    ngAfterViewInit() {
+        this.cd.detectChanges();
     }
 }
 
