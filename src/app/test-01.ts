@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 /**
  * In the following component, update the code so that when the value of the [loan-amount] is changed:
  * * If it's blank or 0, the values of [monthly_payment] and [late_payment] becomes "N/A",
@@ -6,25 +7,47 @@
  */
 
 import { Component, Input,NgModule  } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from "@angular/router";
 
 @Component({
     selector : 'ng-app',
     template : `<div>
                     <h2>Loan Details</h2>
-                    <b>Monthly Payment:</b> {{monthly_payment}} <br/>
-                    <b>Late Payment Fee : {{late_payment}}</b> <br/>
+                    <input placeholder="Entrt loan amout" [(ngModel)]="loan_amount" (ngModelChange)="handleLoanAmountChange($event)"/> <br />
+                    <b>Monthly Payment: </b> 
+                        <span *ngIf="monthly_payment">{{monthly_payment | currency }}</span>
+                        <span *ngIf="!monthly_payment">N/A</span>
+                    <br/>
+                    <b>Late Payment Fee : </b> 
+                        <span *ngIf="late_payment">{{late_payment | currency }}</span>
+                        <span *ngIf="!late_payment">N/A</span>
+                    <br/>
                 </div>`
 })
 export class Test01Component {
 
-    loan_amount:number = 1000;
-    monthly_payment:number = 200;
-    late_payment = 10;
+    loan_amount:number;
+    monthly_payment: number;
+    late_payment: number;
+
+    handleLoanAmountChange(e) {
+        const helper = (amount, percentage) => (amount * percentage) / 100;
+
+        if(e) {
+            this.monthly_payment = helper(e, 2) ;
+            this.late_payment = helper(this.monthly_payment, 5) ;
+        } else {
+            this.monthly_payment = 0;
+            this.late_payment = 0;
+        }
+    }   
 }
 
 @NgModule({
     imports : [
+        CommonModule,
+        FormsModule,
         RouterModule.forChild([
             {
                 path : "",
